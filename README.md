@@ -1,2 +1,103 @@
-# st-dual-ambience
-适用于酒馆(sillytavern)的左右两边显示视屏或图片的酒馆助手插件。
+# 双屏背景氛围 · SillyTavern 全局脚本
+
+> 酒馆界面左右两侧各一个循环媒体位，支持视频与图片混排，内置「电影控制室」暗色主题。
+
+<!-- SCREENSHOT -->
+<p align="center">
+  <img src="screenshots/preview.png" alt="预览截图" width="800">
+</p>
+<!-- /SCREENSHOT -->
+
+## 功能特性
+
+- 左右两侧独立视频/图片背景，共享同一份媒体列表
+- 支持格式：MP4 视频 + PNG / JPG / WebP / GIF 图片混排
+- 独立控制面板（左下角 / 右下角 ⏻）：播放/暂停、上下切换、循环模式、音量、亮度
+- 区域宽度 & 透明度可调，支持一键同步到另一侧
+- 视频开关（带呼吸脉动提示），面板互斥防重叠
+- 切后台自动暂停，回来恢复
+- 所有设置自动保存至 localStorage
+- 内置「电影控制室」主题（Playfair Display + JetBrains Mono）
+- 兼容酒馆助手全局脚本 & 油猴（Tampermonkey）
+
+## 安装
+
+1. 酒馆 → 酒馆助手 → **脚本库** → **全局脚本** → 新建
+2. 将 `st_dual_ambience.js` 全部内容粘贴进去 → 保存启用 → **F5 刷新**
+3. 默认列表为公开演示图片，开箱即用
+
+## 快速上手
+
+| 操作 | 方法 |
+|------|------|
+| 打开面板 | 点击屏幕左下角或右下角的 ⏻ 按钮 |
+| 添加媒体 | 面板内粘贴 URL → 回车或点「添加」 |
+| 左右不同内容 | 两侧面板各自选择列表中的不同项 |
+| 恢复默认 | 面板内点「↺ 恢复默认」 |
+| 彻底重置 | F12 控制台执行 `localStorage.removeItem('st-lr-video-bg-v3')` 后刷新 |
+
+## 文件结构
+
+```
+├── st_dual_ambience.js    # 主脚本（酒馆助手全局脚本）
+├── 操作说明.md        # 用户操作指南
+├── screenshots/       # 效果截图
+└── README.md
+```
+
+## 许可证
+
+本项目采用 [CC BY-NC-SA 4.0](LICENSE) 协议。
+
+---
+
+# Dual-Screen Background Ambience · SillyTavern Global Script
+
+> A looping media slot on each side of the SillyTavern interface, supporting mixed video & image playback with a built-in "Cinema Control Room" dark theme.
+
+<!-- SCREENSHOT -->
+<p align="center">
+  <img src="screenshots/preview.png" alt="Preview screenshot" width="800">
+</p>
+<!-- /SCREENSHOT -->
+
+## Features
+
+- Independent video/image backgrounds on left & right sides, sharing one media list
+- Supported formats: MP4 video + PNG / JPG / WebP / GIF images mixed in one list
+- Independent control panels (bottom-left / bottom-right ⏻): play/pause, prev/next, loop mode, volume, brightness
+- Adjustable region width & opacity, with one-click sync to the other side
+- Power toggle (with breathing pulse indicator), mutually exclusive panels to prevent overlap
+- Auto-pause when tab goes to background, auto-resume on return
+- All settings saved to localStorage automatically
+- Built-in "Cinema Control Room" theme (Playfair Display + JetBrains Mono)
+- Compatible with SillyTavern Assistant global scripts & Tampermonkey
+
+## Installation
+
+1. SillyTavern → SillyTavern Assistant → **Script Library** → **Global Scripts** → New
+2. Paste the entire content of `st_dual_ambience.js` → Save & Enable → **F5 Refresh**
+3. Default list contains public demo images — works out of the box
+
+## Quick Start
+
+| Action | How |
+|--------|-----|
+| Open panel | Click the ⏻ button at bottom-left or bottom-right |
+| Add media | Paste URL in the panel → press Enter or click "Add" |
+| Different content per side | Select different items from the list in each panel |
+| Reset to default | Click "↺ Restore Default" in the panel |
+| Full reset | F12 console: `localStorage.removeItem('st-lr-video-bg-v3')` then refresh |
+
+## File Structure
+
+```
+├── st_dual_ambience.js    # Main script (SillyTavern Assistant global script)
+├── 操作说明.md        # User guide (Chinese)
+├── screenshots/       # Preview screenshots
+└── README.md
+```
+
+## License
+
+This project is licensed under [CC BY-NC-SA 4.0](LICENSE).
