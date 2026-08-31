@@ -49,6 +49,10 @@
 
 本项目采用 [CC BY-NC-SA 4.0](LICENSE) 协议。
 
+## 注意
+
+本脚本针对 **PC 端窄屏**（页面宽度约 50%）优化设计。移动端或超宽屏下效果可能不理想，可通过面板内宽度/透明度滑条自行调节。
+
 ---
 
 # Dual-Screen Background Ambience · SillyTavern Global Script
@@ -101,3 +105,7 @@
 ## License
 
 This project is licensed under [CC BY-NC-SA 4.0](LICENSE).
+
+## Note
+
+This script is optimized for **PC with a narrow layout** (page width ~50%). On mobile or ultra-wide screens, adjust the width/opacity sliders in the panel to suit your setup.
