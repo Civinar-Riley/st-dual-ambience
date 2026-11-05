@@ -1,0 +1,15 @@
+{
+  "name": "st-dual-ambience",
+  "version": "1.1.0",
+  "description": "SillyTavern 双屏背景氛围全局脚本：酒馆界面左右两侧各一个循环视频/图片位，共享媒体列表，独立控制面板",
+  "private": true,
+  "license": "CC-BY-NC-SA-4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Civinar-Riley/st-dual-ambience"
+  },
+  "scripts": {
+    "test": "node --check st_dual_ambience.js",
+    "serve": "python -m http.server 8123"
+  }
+}

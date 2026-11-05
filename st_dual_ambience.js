@@ -1,5 +1,22 @@
+// ==UserScript==
+// @name         双屏背景氛围 · SillyTavern 全局脚本
+// @namespace    https://github.com/Civinar-Riley/st-dual-ambience
+// @version      1.1.0
+// @description  酒馆界面左右两侧各一个循环视频/图片位，共享媒体列表，独立控制面板
+// @author       Civinar-Riley
+// @match        http://localhost:8000/*
+// @match        http://127.0.0.1:8000/*
+// @grant        none
+// @noframes
+// @run-at       document-end
+// @license      CC-BY-NC-SA-4.0
+// @homepageURL  https://github.com/Civinar-Riley/st-dual-ambience
+// @supportURL   https://github.com/Civinar-Riley/st-dual-ambience/issues
+// ==/UserScript==
+/* 油猴使用：新建脚本粘贴本文件，把 @match 改成你的酒馆地址（酒馆助手脚本库使用时无视此头） */
+
 // ================================================================
-// ✦ 左右视频背景 · 酒馆助手全局脚本 v3（双实例 + 共享列表 + 视频开关）
+// ✦ 左右视频背景 · 酒馆助手全局脚本 v3.1（双实例 + 共享列表 + 视频开关）
 // 作用：酒馆界面【左侧】与【右侧】各一个循环视频位：
 //      - 共享同一份视频列表（任一侧添加/删除/恢复默认，两侧同步）
 //      - 各自独立的控制面板（左下角 / 右下角 ⏻）：播放/暂停、上下切换、
@@ -56,6 +73,7 @@
   }
   function clampSide(sd, list) {
     sd.idx = Math.min(sd.idx || 0, list.length - 1); if (sd.idx < 0) sd.idx = 0;
+    if (!['loop', 'list', 'random'].includes(sd.mode)) sd.mode = 'loop';
     sd.volume = Math.min(1, Math.max(0, +sd.volume || 0));
     sd.brightness = Math.min(1.5, Math.max(0.5, +sd.brightness || 1));
     sd.width = Math.min(100, Math.max(10, +sd.width || 26));
@@ -64,16 +82,24 @@
   }
   function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
 
+  const isImage = u => /\.(png|jpe?g|webp|gif|avif|bmp)(?:[?#]|$)/i.test(String(u || ''));
+
   const HOST = window.parent.document;   // 脚本在 iframe 中，宿主文档才是酒馆本体
 
   /* ============ 清理旧实例（脚本重载安全） ============ */
-  HOST.querySelectorAll('.lvp-video,.lvp,.lvp-toggle-btn,.lvp-style').forEach(el => el.remove());
+  HOST.querySelectorAll('.lvp-video,.lvp,.lvp-toggle-btn,.lvp-style,.lvp-toast,.lvp-fonts').forEach(el => el.remove());
 
   /* ============ 共享样式 ============ */
+  /* 字体用 <link> 而非 @import：不阻塞面板渲染 */
+  const fonts = HOST.createElement('link');
+  fonts.className = 'lvp-fonts';
+  fonts.rel = 'stylesheet';
+  fonts.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap';
+  HOST.head.appendChild(fonts);
+
   const css = HOST.createElement('style');
   css.className = 'lvp-style';
   css.textContent = `
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap');
 .lvp{
   --fg:#e2dfd8;
   --fg2:rgba(226,223,216,.5);
@@ -297,31 +323,42 @@
 
     /* 样式应用（不含 src——src 只由 loadCurrent 变更，避免调音量/亮度时视频重播） */
     let showingImage = false;
-    const isImage = u => /\.(png|jpe?g|webp|gif|avif|bmp)(?:[?#]|$)/i.test(String(u || ''));
     function applyMediaStyle() {
       video.loop = (sd.mode === 'loop');
       video.volume = sd.volume; video.muted = (sd.volume <= 0);
-      const vDisp = sd.off ? 'none' : (showingImage ? 'none' : '');
-      const iDisp = sd.off ? 'none' : (showingImage ? '' : 'none');
       video.style.filter = `brightness(${sd.brightness})`;
       video.style.width = sd.width + 'vw';
-      video.style.opacity = sd.off ? 0 : sd.opacity;
-      video.style.display = vDisp;
-      video.style.left = side === 'left' ? '0' : 'auto';
-      video.style.right = side === 'right' ? '0' : 'auto';
+      video.style.opacity = sd.opacity;
+      video.style.display = sd.off || showingImage ? 'none' : '';
       img.style.filter = video.style.filter;
       img.style.width = video.style.width;
       img.style.opacity = video.style.opacity;
-      img.style.display = iDisp;
-      img.style.left = video.style.left;
-      img.style.right = video.style.right;
+      img.style.display = sd.off || !showingImage ? 'none' : '';
     }
+    let currentUrl = null;   // 已加载的媒体地址；不变则不重设 src，避免模式切换/重复点击重启播放
     function loadCurrent(autoplay = true) {
       const url = S.list[sd.idx] || '';
-      showingImage = isImage(url);
-      if (showingImage) img.src = url; else video.src = url;
+      errEl.textContent = '';
+      if (url !== currentUrl) {
+        currentUrl = url;
+        showingImage = isImage(url);
+        if (showingImage) {
+          video.pause();
+          video.removeAttribute('src');   // 停掉后台解码
+          video.load();
+          img.src = url;
+        } else if (url) {
+          img.removeAttribute('src');
+          video.src = url;
+        } else {   // 空地址：清空两侧画面
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+          img.removeAttribute('src');
+        }
+      }
       applyMediaStyle();
-      if (showingImage) { try { video.pause(); } catch (e) {} return; }
+      if (!url || showingImage) return;
       if (autoplay && !sd.off) video.play().catch(() => {});
     }
     function syncPowerUi() {
@@ -332,7 +369,8 @@
     function setPower(on) {
       sd.off = !on;
       save(); applyMediaStyle(); syncPowerUi();
-      if (on) video.play().catch(() => {}); else video.pause();
+      if (!on) video.pause();
+      else if (!showingImage) video.play().catch(() => {});
     }
     function syncPlayIcon() {
       if (showingImage) {
@@ -355,12 +393,6 @@
     function renderList() {
       const box = $('.lvp-list');
       box.innerHTML = '';
-      if (!S.list.length) {
-        const empty = HOST.createElement('div');
-        empty.style.cssText = 'font-size:11px;opacity:.5;padding:6px 2px';
-        empty.textContent = '列表为空——添加一个地址，或点「↺ 恢复默认」';
-        box.appendChild(empty); return;
-      }
       S.list.forEach((u, i) => {
         const it = HOST.createElement('div');
         it.className = 'lvp-item' + (i === sd.idx ? ' on' : '');
@@ -370,7 +402,10 @@
         const del = HOST.createElement('button'); del.className = 'del'; del.textContent = '✕'; del.title = '删除';
         del.addEventListener('click', ev => { ev.stopPropagation(); delItem(i); });
         it.appendChild(nm); it.appendChild(del);
-        it.addEventListener('click', () => { sd.idx = i; save(); loadCurrent(); renderAllLists(); syncPlayIcon(); });
+        it.addEventListener('click', () => {
+          if (sd.idx === i) return;   // 点当前项不重播
+          sd.idx = i; save(); loadCurrent(); renderAllLists(); syncPlayIcon();
+        });
         box.appendChild(it);
       });
     }
@@ -386,17 +421,30 @@
       if (!u) { errEl.textContent = '请先填写视频地址'; return; }
       if (!/^https?:\/\//i.test(u) && !u.startsWith('/')) { errEl.textContent = '地址需以 http(s):// 或 / 开头'; return; }
       errEl.textContent = '';
+      const exist = S.list.indexOf(u);
+      if (exist >= 0) {   // 已存在 → 选中而非重复添加
+        sd.idx = exist; save(); loadCurrent(); renderAllLists(); syncPlayIcon();
+        inp.value = '';
+        toast('地址已存在，已切换到该项');
+        return;
+      }
       S.list.push(u); sd.idx = S.list.length - 1; save();
       inp.value = '';
-      loadCurrent(); renderAllLists();
+      loadCurrent(); renderAllLists(); syncPlayIcon();
       toast('已添加并播放');
     }
     function delItem(i) {
       if (S.list.length <= 1) { errEl.textContent = '至少保留一项'; return; }
       S.list.splice(i, 1);
-      if (sd.idx >= S.list.length) sd.idx = S.list.length - 1;
-      if (sd.idx > i) sd.idx--;
-      save(); loadCurrent(); renderAllLists();
+      const sync = sd2 => {   // 先左移（删中前项时），再钳制越界；顺序不能反，否则双重移位
+        if (sd2.idx > i) sd2.idx--;
+        if (sd2.idx >= S.list.length) sd2.idx = S.list.length - 1;
+      };
+      const otherBefore = S.sides[other].idx;
+      sync(sd); sync(S.sides[other]);
+      save(); loadCurrent(); renderAllLists();   // 两侧索引都同步后再存储与渲染
+      const otherInst = insts.find(x => x.side === other);
+      if (otherInst && S.sides[other].idx !== otherBefore) otherInst.loadCurrent();
       toast('已删除');
     }
 
@@ -410,6 +458,7 @@
       }
     });
     video.addEventListener('error', () => { errEl.textContent = '⚠️ 当前地址加载失败：' + (S.list[sd.idx] || ''); });
+    img.addEventListener('error', () => { errEl.textContent = '⚠️ 当前地址加载失败：' + (S.list[sd.idx] || ''); });
 
     btn.addEventListener('click', () => {
       /* 视频已关闭 → 点 ⏻ 直接恢复；否则开合面板（互斥：同时收起另一侧面板） */
@@ -422,6 +471,7 @@
       const a = e.target.closest('[data-a]')?.dataset.a;
       if (!a) return;
       if (a === 'toggle') {
+        if (showingImage) return;   // 图片条目没有走带状态，也不动另一侧
         /* 暂停/播放同步到另一侧（各自播放条目不变，只同步走带状态） */
         const willPause = !video.paused;
         const otherV = (insts.find(i => i.side === other) || {}).video;
@@ -464,7 +514,7 @@
     panel.addEventListener('click', e => {
       const m = e.target.dataset.mode;
       if (!m) return;
-      sd.mode = m; save(); loadCurrent(); syncMode();
+      sd.mode = m; save(); applyMediaStyle(); syncMode();   // 只更新 loop 标志，不打断播放
     });
     panel.addEventListener('input', e => {
       const v = +e.target.value;
@@ -500,6 +550,7 @@
   function renderAllLists() { for (const inst of insts) inst.renderList(); }
   function toast(msg) {
     const t = HOST.createElement('div');
+    t.className = 'lvp-toast';
     t.textContent = msg;
     t.style.cssText = 'position:fixed;left:50%;bottom:44px;transform:translateX(-50%);background:rgba(15,17,26,.92);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;z-index:100000';
     HOST.body.appendChild(t);
