@@ -24,9 +24,10 @@
 
 **方式一：酒馆助手（推荐）**
 
-1. 酒馆 → 酒馆助手 → **脚本库** → **全局脚本** → 新建
-2. 将 `st_dual_ambience.js` 全部内容粘贴进去 → 保存启用 → **F5 刷新**
-3. 默认列表为公开演示图片，开箱即用
+1. 从[最新 Release](https://github.com/Civinar-Riley/st-dual-ambience/releases/latest) 下载 `st-dual-ambience.tavern-helper.json`
+2. 酒馆 → 酒馆助手 → **脚本库** → **全局脚本** → 工具栏 **导入** → 选择该 JSON → 启用脚本 → **F5 刷新**
+3. 也可新建脚本并粘贴 `st_dual_ambience.js` 全部内容（效果相同）
+4. 默认列表为公开演示图片，开箱即用
 
 **方式二：油猴（Tampermonkey）**
 
@@ -102,9 +103,10 @@ npm test             # node --check 语法检查
 
 **Option A: SillyTavern Assistant (recommended)**
 
-1. SillyTavern → SillyTavern Assistant → **Script Library** → **Global Scripts** → New
-2. Paste the entire content of `st_dual_ambience.js` → Save & Enable → **F5 Refresh**
-3. Default list contains public demo images — works out of the box
+1. Download `st-dual-ambience.tavern-helper.json` from the [latest release](https://github.com/Civinar-Riley/st-dual-ambience/releases/latest)
+2. SillyTavern → SillyTavern Assistant → **Script Library** → **Global Scripts** → toolbar **Import** → select the JSON → Enable → **F5 Refresh**
+3. Alternatively, create a new script and paste the entire content of `st_dual_ambience.js` (equivalent)
+4. Default list contains public demo images — works out of the box
 
 **Option B: Tampermonkey**
 
