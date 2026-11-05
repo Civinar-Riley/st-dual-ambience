@@ -4,7 +4,7 @@
 
 <!-- SCREENSHOT -->
 <p align="center">
-  <img src="screenshots/preview.png" alt="预览截图" width="800">
+  <img src="screenshots/preview.jpg" alt="预览截图" width="800">
 </p>
 <!-- /SCREENSHOT -->
 
@@ -22,9 +22,16 @@
 
 ## 安装
 
+**方式一：酒馆助手（推荐）**
+
 1. 酒馆 → 酒馆助手 → **脚本库** → **全局脚本** → 新建
 2. 将 `st_dual_ambience.js` 全部内容粘贴进去 → 保存启用 → **F5 刷新**
 3. 默认列表为公开演示图片，开箱即用
+
+**方式二：油猴（Tampermonkey）**
+
+1. Tampermonkey → 添加新脚本 → 粘贴 `st_dual_ambience.js` 全部内容
+2. 把头部 `@match` 改成你的酒馆地址（默认 `http://localhost:8000/*`）→ 保存刷新
 
 ## 快速上手
 
@@ -39,11 +46,25 @@
 ## 文件结构
 
 ```
-├── st_dual_ambience.js    # 主脚本（酒馆助手全局脚本）
-├── 操作说明.md        # 用户操作指南
-├── screenshots/       # 效果截图
+├── st_dual_ambience.js    # 主脚本（酒馆助手全局脚本，含油猴头）
+├── 操作说明.md            # 用户操作指南
+├── package.json           # 项目元信息与 npm scripts（无依赖）
+├── test/                  # 精简测试页（模拟酒馆助手 iframe 环境）
+│   ├── index.html         # 宿主页：打开即运行，含回归检查单
+│   ├── env.html           # 执行环境 iframe：加载主脚本
+│   └── assets/demo.mp4    # 本地走带测试视频（ffmpeg 生成）
+├── screenshots/           # 效果截图
 └── README.md
 ```
+
+## 本地测试
+
+```bash
+npm run serve        # 等价 python -m http.server 8123
+npm test             # node --check 语法检查
+```
+
+浏览器打开 `http://localhost:8123/test/`，按页内检查单回归。测试页拓扑与酒馆助手一致：脚本在 `test/env.html` 的 iframe 中执行，通过 `window.parent.document` 操作宿主 `test/index.html`。
 
 ## 许可证
 
@@ -61,7 +82,7 @@
 
 <!-- SCREENSHOT -->
 <p align="center">
-  <img src="screenshots/preview.png" alt="Preview screenshot" width="800">
+  <img src="screenshots/preview.jpg" alt="Preview screenshot" width="800">
 </p>
 <!-- /SCREENSHOT -->
 
@@ -79,9 +100,16 @@
 
 ## Installation
 
+**Option A: SillyTavern Assistant (recommended)**
+
 1. SillyTavern → SillyTavern Assistant → **Script Library** → **Global Scripts** → New
 2. Paste the entire content of `st_dual_ambience.js` → Save & Enable → **F5 Refresh**
 3. Default list contains public demo images — works out of the box
+
+**Option B: Tampermonkey**
+
+1. Tampermonkey → Create a new script → paste the entire content of `st_dual_ambience.js`
+2. Edit the `@match` header to your tavern address (defaults to `http://localhost:8000/*`) → Save & refresh
 
 ## Quick Start
 
@@ -96,11 +124,25 @@
 ## File Structure
 
 ```
-├── st_dual_ambience.js    # Main script (SillyTavern Assistant global script)
-├── 操作说明.md        # User guide (Chinese)
-├── screenshots/       # Preview screenshots
+├── st_dual_ambience.js    # Main script (Tavern Assistant global script, with userscript header)
+├── 操作说明.md            # User guide (Chinese)
+├── package.json           # Project metadata & npm scripts (zero dependencies)
+├── test/                  # Minimal test page (simulates the Tavern Assistant iframe environment)
+│   ├── index.html         # Host page with a regression checklist
+│   ├── env.html           # Execution iframe: loads the main script
+│   └── assets/demo.mp4    # Local transport-control test clip (ffmpeg-generated)
+├── screenshots/           # Preview screenshots
 └── README.md
 ```
+
+## Local Testing
+
+```bash
+npm run serve        # equivalent to python -m http.server 8123
+npm test             # node --check syntax check
+```
+
+Open `http://localhost:8123/test/` and follow the on-page checklist. The test page mirrors the Tavern Assistant topology: the script runs inside the `test/env.html` iframe and touches the host `test/index.html` via `window.parent.document`.
 
 ## License
 

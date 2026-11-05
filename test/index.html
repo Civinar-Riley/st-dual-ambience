@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>st-dual-ambience 本地测试</title>
+<style>
+  body{margin:0;min-height:100vh;background:linear-gradient(160deg,#141428,#1e1a2e);color:#e2dfd8;
+       font:13px/1.7 'Segoe UI','Microsoft YaHei',sans-serif;display:flex;justify-content:center}
+  .note{position:absolute;top:12px;width:min(560px,90vw);background:rgba(0,0,0,.55);border:1px solid rgba(212,168,83,.25);
+        border-radius:6px;padding:10px 16px;z-index:50}
+  .note h1{font-size:14px;margin:0 0 6px;color:#d4a853}
+  .note code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;font-size:12px}
+  .note li{margin:2px 0}
+</style>
+</head>
+<body>
+<div class="note">
+  <h1>st-dual-ambience 测试页（宿主 = 模拟酒馆本体）</h1>
+  <ul>
+    <li>底部左右两角应出现 <b>⏻</b> 按钮，默认列表为 Pexels 演示图片（需联网；离线时加载失败提示属预期）。</li>
+    <li>点 <b>⏻</b> 开面板（两侧互斥）；添加本地视频 <code>/test/assets/demo.mp4</code> 验证走带控制。</li>
+    <li>重点回归：切<b>循环模式</b>不打断播放；<b>暂停/播放</b>同步两侧；<b>删除条目</b>后另一侧选中项跟随；重复添加同一地址只切换不重复。</li>
+    <li>重置状态：控制台执行 <code>localStorage.removeItem('st-lr-video-bg-v3')</code> 后刷新。</li>
+    <li>须通过本地 HTTP 访问（file:// 下 iframe 受跨源限制）：<code>npm run serve</code> 后打开 <code>/test/</code>。</li>
+  </ul>
+</div>
+<iframe src="env.html" style="width:1px;height:1px;border:0;position:absolute" title="脚本执行环境"></iframe>
+</body>
+</html>
